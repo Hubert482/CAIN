@@ -9,12 +9,13 @@ import torch
 import numpy as np
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
-
+#hmm i changed here few things look at my fork https://github.com/Hubert482/CAIN
 import config
 import utils
 from loss import Loss
 
-
+import threading
+modelname="2x_Hubert_HD"
 ##### Parse CmdLine Arguments #####
 args, unparsed = config.get_args()
 cwd = os.getcwd()
@@ -36,7 +37,7 @@ if args.cuda:
 
 ##### Load Dataset #####
 train_loader, test_loader = utils.load_dataset(
-    args.dataset, args.data_root, args.batch_size, args.test_batch_size, args.num_workers, args.test_mode)
+    args.dataset, args.data_root, args.batch_size, args.test_batch_size, 1, args.test_mode)
 
 
 ##### Build Model #####
@@ -79,23 +80,33 @@ if args.resume:
 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
     optimizer, mode='min', factor=0.5, patience=5, verbose=True)
 
-
+#torch.set_default_tensor_type(torch.cuda.HalfTensor)
 # Initialize LPIPS model if used for evaluation
 # lpips_model = utils.init_lpips_eval() if args.lpips else None
 lpips_model = None
 
 LOSS_0 = 0
 
-
 def train(args, epoch):
+    global startedpbar
+    startedpbar=0
     global LOSS_0
     losses, psnrs, ssims, lpips = utils.init_meters(args.loss)
     model.train()
     criterion.train()
 
     t = time.time()
-    for i, (images, imgpaths) in enumerate(train_loader):
 
+    
+    for i, (images, imgpaths) in enumerate(train_loader):
+        #print(startedpbar)
+        if startedpbar==0:
+            pbar=tqdm(range(i, len(train_loader)))
+            startedpbar=1
+        else:
+            startedpbar=1
+            #print(startedpbar)
+        
         # Build input batch
         im1, im2, gt = utils.build_input(images, imgpaths)
 
@@ -124,20 +135,20 @@ def train(args, epoch):
         if i % args.log_iter == 0:
             utils.eval_metrics(out, gt, psnrs, ssims, lpips, lpips_model)
 
-            print('Train Epoch: {} [{}/{}]\tLoss: {:.6f}\tPSNR: {:.4f}\tTime({:.2f})'.format(
-                epoch, i, len(train_loader), losses['total'].avg, psnrs.avg, time.time() - t))
-            
+           #print('Train Epoch: {} [{}/{}]\tLoss: {:.6f}\tPSNR: {:.4f}\tTime({:.2f})'.format(
+           #     epoch, i, len(train_loader), losses['total'].avg, psnrs.avg, time.time() - t))
+            pbar.update(1)
+            pbar.set_postfix({'psnr': psnrs.avg, 'Loss': losses['total'].avg, 'epoch': epoch })
             # Log to TensorBoard
             utils.log_tensorboard(writer, losses, psnrs.avg, ssims.avg, lpips.avg,
                 optimizer.param_groups[-1]['lr'], epoch * len(train_loader) + i)
-
             # Reset metrics
             losses, psnrs, ssims, lpips = utils.init_meters(args.loss)
             t = time.time()
 
 
 def test(args, epoch, eval_alpha=0.5):
-    print('Evaluating for epoch = %d' % epoch)
+    print('Evaluating for  %d' % epoch)
     losses, psnrs, ssims, lpips = utils.init_meters(args.loss)
     model.eval()
     criterion.eval()
@@ -180,7 +191,6 @@ def test(args, epoch, eval_alpha=0.5):
                 print("\nLoss: %f, PSNR: %f, SSIM: %f, LPIPS: %f" %
                       (losses['total'].val, psnrs.val, ssims.val, lpips.val))
                 print(imgpaths[1][-1])
-
             # Save result images
             if ((epoch + 1) % 1 == 0 and i < 20) or args.mode == 'test':
                 savepath = os.path.join('checkpoint', args.exp_name, save_folder)
@@ -193,6 +203,8 @@ def test(args, epoch, eval_alpha=0.5):
                     # remove '.png' extension
                     fp = os.path.join(fp, paths[-1][:-4])
                     utils.save_image(out[b], "%s.png" % fp)
+                    
+
                     
     # Print progress
     print('im_processed: {:d}/{:d} {:.3f}s   \r'.format(i + 1, len(test_loader), time.time() - t))
@@ -221,7 +233,6 @@ def main(args):
 
     best_psnr = 0
     for epoch in range(args.start_epoch, args.max_epoch):
-        
         # run training
         train(args, epoch)
 
@@ -235,7 +246,8 @@ def main(args):
             'epoch': epoch,
             'state_dict': model.state_dict(),
             'optimizer': optimizer.state_dict(),
-            'best_psnr': best_psnr
+            'best_psnr': best_psnr,
+            'model_name': modelname
         }, is_best, args.exp_name)
 
         # update optimizer policy

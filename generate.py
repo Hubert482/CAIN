@@ -55,7 +55,7 @@ print('# of parameters: %d' % sum(p.numel() for p in model.parameters()))
 # If resume, load checkpoint: model
 if args.resume:
     #utils.load_checkpoint(args, model, optimizer=None)
-    checkpoint = torch.load('pretrained_cain.pth')
+    checkpoint = torch.load('checkpoint.pth')
     args.start_epoch = checkpoint['epoch'] + 1
     model.load_state_dict(checkpoint['state_dict'])
     del checkpoint
