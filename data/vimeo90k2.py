@@ -19,13 +19,6 @@ class VimeoTriplet(Dataset):
         with open(test_fn, 'r') as f:
             self.testlist = f.read().splitlines()
         
-        self.transforms = transforms.Compose([
-            transforms.RandomCrop(256),
-            transforms.RandomHorizontalFlip(0.5),
-            transforms.RandomVerticalFlip(0.5),
-            transforms.ColorJitter(0.05, 0.05, 0.05, 0.05),
-            transforms.ToTensor()
-        ])
         
 
     def __getitem__(self, index):
@@ -42,13 +35,10 @@ class VimeoTriplet(Dataset):
 
         # Data augmentation
         if self.training:
-            seed = random.randint(0, 2**32)
-            random.seed(seed)
-            img1 = self.transforms(img1)
-            random.seed(seed)
-            img2 = self.transforms(img2)
-            random.seed(seed)
-            img3 = self.transforms(img3)
+            T = transforms.ToTensor()
+            img1 = T(img1)
+            img2 = T(img2)
+            img3 = T(img3)
             # Random Temporal Flip
             if random.random() >= 0.5:
                 img1, img3 = img3, img1
