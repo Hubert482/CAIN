@@ -239,7 +239,7 @@ def main(args):
         # run test
         test_loss, psnr, _, _ = test(args, epoch)
         if args.colab ==True:
-        	exp_name_1=f"/content/gdrive/MyDrive/CAIN_MODELS/{args.exp_name}"
+        	exp_name_1=f"../../gdrive/MyDrive/CAIN_MODELS/{args.exp_name}"
         else:
         	exp_name_1=fargs.exp_name
         # save checkpoint
