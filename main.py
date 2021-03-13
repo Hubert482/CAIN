@@ -238,7 +238,10 @@ def main(args):
 
         # run test
         test_loss, psnr, _, _ = test(args, epoch)
-
+        if args.colab ==True:
+        	exp_name_1=f"/content/gdrive/MyDrive/CAIN_MODELS/{args.exp_name}"
+        else:
+        	exp_name_1=fargs.exp_name
         # save checkpoint
         is_best = psnr > best_psnr
         best_psnr = max(psnr, best_psnr)
@@ -248,7 +251,7 @@ def main(args):
             'optimizer': optimizer.state_dict(),
             'best_psnr': best_psnr,
             'model_name': modelname
-        }, is_best, args.exp_name)
+        }, is_best, exp_name_1)
 
         # update optimizer policy
         scheduler.step(test_loss)

@@ -40,6 +40,7 @@ learn_arg.add_argument('--test_mode', type=str, default='hard', help='Test mode 
 learn_arg.add_argument('--start_epoch', type=int, default=0)
 learn_arg.add_argument('--max_epoch', type=int, default=200)
 learn_arg.add_argument('--resume', action='store_true')
+learn_arg.add_argument('--colab', action='store_true')
 learn_arg.add_argument('--resume_exp', type=str, default=None)
 learn_arg.add_argument('--fix_loaded', action='store_true', help='whether to fix updating all loaded parts of the model')
 
