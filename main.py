@@ -27,8 +27,8 @@ try:
 except:
     print("cant remove 1.josn")
 f= open("1.json","w+")
-f.write('{ "n_resblocks": ' +(args.n_resblocks)+ ', "n_resgroups": '+(args.n_resgroups)+' }')
-
+f.write('{\n    "n_resblocks":' + f'{args.n_resblocks}, \n    "n_resgroups":{(args.n_resgroups)}' +' \n}')
+f.close()
 
 #############
 
