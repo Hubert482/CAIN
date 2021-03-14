@@ -76,6 +76,8 @@ conda install tqdm opencv tensorboard
 ## Usage
 
 #### Training / Testing with Vimeo90K dataset
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)(https://colab.research.google.com/github/{user_name}/{repo_name}/blob/{branch_name}/Training.ipynb)]
+
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Hubert482/CAIN/blob/master/Training.ipynb]
 - First make symbolic links in `data/` folder : `ln -s /path/to/vimeo_triplet_data/ ./data/vimeo_triplet`
   - [Vimeo90K dataset](http://toflow.csail.mit.edu/)
