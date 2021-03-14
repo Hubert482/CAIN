@@ -22,7 +22,8 @@ data_arg.add_argument('--img_fmt', type=str, default='png')
 model_arg = add_argument_group('Model')
 model_arg.add_argument('--model', type=str, default='CAIN')
 model_arg.add_argument('--depth', type=int, default=3, help='# of pooling')
-model_arg.add_argument('--n_resblocks', type=int, default=12)
+model_arg.add_argument('--n_resblocks', default="12")
+model_arg.add_argument('--n_resgroups', default="6")
 model_arg.add_argument('--up_mode', type=str, default='shuffle')
 
 # Training / test parameters
