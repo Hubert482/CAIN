@@ -241,7 +241,7 @@ def main(args):
         if args.colab ==True:
         	exp_name_1=f"../../gdrive/MyDrive/CAIN_MODELS/{args.exp_name}"
         else:
-        	exp_name_1=fargs.exp_name
+        	exp_name_1=args.exp_name
         # save checkpoint
         is_best = psnr > best_psnr
         best_psnr = max(psnr, best_psnr)
