@@ -21,6 +21,18 @@ args, unparsed = config.get_args()
 cwd = os.getcwd()
 print(args)
 
+############
+if args.colab==True:
+    try:
+        os.remove("1.json")
+    except:
+        print("cant remove 1.josn")
+    f= open("1.json","w+")
+    f.write('{ "n_resblocks":' +(args.n_resblocks)+ ', "n_resgroups":'+(args.n_resgroups)+' }')
+
+
+
+#############
 
 ##### TensorBoard & Misc Setup #####
 if args.mode != 'test':
